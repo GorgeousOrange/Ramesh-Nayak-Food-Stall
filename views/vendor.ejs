@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17251d">
+  <meta name="description" content="<%= vendor.description %>">
+  <title><%= vendor.name %> | Neighbourhood</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="announcement">Freshly prepared • Friendly service • Made in Goa</div>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Back to Neighbourhood"><span class="brand-mark">N</span><span><strong>Neighbourhood</strong><small>DISCOVER LOCAL FOOD</small></span></a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+    <nav id="mainNav">
+      <a href="/">Discover vendors</a><a href="#menu">Menu</a><a href="#about">Our story</a><a href="#location">Find us</a><a class="nav-cta" href="#feedback">Give feedback</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot"></span> <%= vendor.tagline || "YOUR NEIGHBOURHOOD FOOD STOP" %></span>
+        <h1><%= vendor.hero_title || "Good food." %><br><em><%= vendor.hero_subtitle || "Good mood." %></em></h1>
+        <p><%= vendor.hero_description || vendor.description %></p>
+        <div class="hero-actions"><a class="button button-primary" href="#menu">Explore the menu <span>↗</span></a><a class="text-link" href="#location">Find our stall <span>→</span></a></div>
+        <div class="hero-note"><span class="note-icon">✦</span><span><strong>Freshly prepared</strong><small>Every order, made with care</small></span></div>
+      </div>
+      <div class="hero-art" role="img" aria-label="Illustration of a delicious street-food spread">
+        <div class="sun"></div>
+        <div class="food-card food-card-one"><span>🥘</span><b>Pav Bhaji</b><small>Rich • buttery • comforting</small></div>
+        <div class="food-card food-card-two"><span>🌯</span><b>Fresh Rolls</b><small>Made when you order</small></div>
+        <div class="food-card food-card-three"><span>☕</span><b>Chai Time</b><small>A little cup of happiness</small></div>
+        <div class="hero-sticker">MADE<br>WITH<br>CARE<br><strong>♥</strong></div>
+        <div class="art-caption">A little street-side<br>happiness in Goa.</div>
+      </div>
+    </section>
+
+    <section class="trust-strip" aria-label="Our values">
+      <div><span>✳</span> Fresh ingredients</div><div><span>⌁</span> Quick service</div><div><span>♡</span> Customer first</div><div><span>☼</span> Local flavour</div>
+    </section>
+
+    <section class="section menu-section" id="menu">
+      <div class="section-heading"><div><span class="eyebrow">MADE TO SATISFY</span><h2>Something for<br><em>every craving.</em></h2></div><p>Swipe or scroll sideways to see everything we serve. Menu and prices are maintained by the vendor.</p></div>
+      <div class="menu-scroller-wrap">
+        <button class="scroll-btn scroll-prev" id="menuPrev" aria-label="Scroll menu left" disabled>←</button>
+        <div class="menu-scroller" id="menuScroller" tabindex="0" role="region" aria-label="Menu, scroll sideways">
+          <% menuItems.forEach(item => { %>
+          <article class="menu-card"><div class="menu-img"><% if (item.image_url) { %><img src="<%= item.image_url %>" alt="<%= item.name %>" loading="lazy" width="640" height="640"><% } else { %><div class="menu-placeholder"><%= item.name.charAt(0) %></div><% } %></div><div class="menu-meta"><span><%= item.label || "MADE FRESH" %></span><b><%= item.price ? "₹" + item.price : "Ask at stall" %></b></div><h3><%= item.name %></h3><p><%= item.description || "Prepared fresh when you order." %></p></article>
+          <% }) %>
+        </div>
+        <button class="scroll-btn scroll-next" id="menuNext" aria-label="Scroll menu right">→</button>
+      </div>
+      <p class="scroll-hint">Swipe to see more <span>→</span></p>
+      <p class="menu-footnote">Menu and prices are provided by the vendor. Please confirm availability at the stall.</p>
+    </section>
+
+    <section class="story-section" id="about">
+      <div class="story-visual"><div class="story-circle">8<small>YEARS OF<br>STREET-FOOD<br>EXPERIENCE</small></div><span class="story-scribble">A taste of Goa ✳</span></div>
+      <div class="story-copy"><span class="eyebrow">A LITTLE ABOUT US</span><h2>Made with care,<br><em>served with a smile.</em></h2><p><strong><%= vendor.greeting || "Namaskar!" %></strong> <%= vendor.story_intro %></p><p><%= vendor.story_body %></p><p><%= vendor.story_feedback || "I am always trying to get better, so please tell me what you liked and what I can improve in the feedback section below." %></p><p class="story-sign">- <%= vendor.owner_name %></p><a class="text-link" href="#location">Come say hello <span>→</span></a></div>
+    </section>
+
+    <section class="location-section section" id="location">
+      <div class="section-heading"><div><span class="eyebrow">DROP BY WHENEVER YOU'RE HUNGRY</span><h2>Find our <em>stall.</em></h2></div><p><%= vendor.location_intro || "Find our stall and come say hello." %></p></div>
+      <div class="location-card">
+        <div class="location-details">
+          <div class="location-icon">⌖</div><span class="eyebrow">OUR LOCATION</span><h3><%= vendor.name %></h3>
+          <p id="addressText"><%= vendor.address || "Location details coming soon" %></p>
+          <div class="location-actions"><a class="button button-primary" id="directionsLink" href="<%= vendor.maps_url || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(vendor.address || vendor.name) %>" target="_blank" rel="noopener">Get directions ↗</a><button class="button button-outline" id="copyAddress">Copy address</button></div>
+          <div class="hours"><span>◷</span><div><b>Opening hours</b><p><%= vendor.hours || "Please check with the vendor" %></p></div></div>
+          <div class="contact"><span>☎</span><div><b>Call us</b><p><a id="phoneLink" href="<%= vendor.phone_href || "#" %>"><%= vendor.phone_display || "Contact details coming soon" %></a></p></div></div>
+          <div class="platforms"><span class="platforms-text">You can also find us on <b>Zomato</b> and <b>Swiggy</b>.</span><div class="platform-links"><a class="platform-btn zomato" id="zomatoLink" href="<%= vendor.zomato_url || "https://www.zomato.com/goa" %>" target="_blank" rel="noopener">Zomato ↗</a><a class="platform-btn swiggy" id="swiggyLink" href="<%= vendor.swiggy_url || "https://www.swiggy.com/" %>" target="_blank" rel="noopener">Swiggy ↗</a></div></div>
+          <small class="edit-hint">Prototype note: the Zomato and Swiggy buttons open each platform's home page until Add verified listing links in your vendor dashboard. The map panel is an illustration; confirm the exact stall location before publishing.</small>
+        </div>
+        <div class="map-panel"><div class="map-grid"></div><div class="map-pin">⌖</div><div class="map-label"><b><%= vendor.name %></b><small><%= vendor.address || "Location details coming soon" %></small></div><span class="map-watermark">MAP PREVIEW</span></div>
+      </div>
+    </section>
+
+    <section class="feedback-section" id="feedback">
+      <div class="feedback-top">
+        <div class="feedback-intro"><span class="eyebrow">YOUR WORDS MATTER MOST</span><h2>Tell me how<br><em>we did today.</em></h2><p>This is the most important part of my stall. It takes about two minutes, and every answer helps us decide what to prepare and what to improve first.</p><div class="feedback-quote">“Every suggestion helps us grow.”<span>- <%= vendor.owner_name %></span></div></div>
+        <div class="learn-grid" aria-label="How feedback helps">
+          <div><b>⏱ Waiting time</b><span>Helps me plan for the evening rush.</span></div>
+          <div><b>🥘 Freshness &amp; taste</b><span>Helps me prepare the right amount of food.</span></div>
+          <div><b>🧼 Cleanliness</b><span>Keeps the stall spotless and trusted.</span></div>
+          <div><b>₹ Value for money</b><span>Helps me keep prices fair.</span></div>
+        </div>
+      </div>
+
+      <form class="feedback-form" id="feedbackForm" novalidate>
+        <div class="fb-head"><h3>Share your experience</h3><div class="progress" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div><small id="progressText">0% complete</small></div>
+
+        <fieldset class="fb-group"><legend><span class="step">1</span> About your visit</legend>
+          <div class="grid-2">
+            <div class="field"><label for="customerName">Your name <em>(optional)</em></label><input id="customerName" name="name" type="text" placeholder="What should I call you?" autocomplete="given-name"></div>
+            <div class="field"><label for="visitDate">Visit date</label><input id="visitDate" name="visit_date" type="date" data-track></div>
+          </div>
+          <div class="field" data-field="visit_type"><span class="q">How did you have your food?</span><div class="chips"><label class="chip"><input type="radio" name="visit_type" value="Dine-in"><span>Dine-in</span></label><label class="chip"><input type="radio" name="visit_type" value="Takeaway"><span>Takeaway</span></label><label class="chip"><input type="radio" name="visit_type" value="Online order"><span>Online order</span></label></div></div>
+          <div class="field" data-field="ordered"><span class="q">What did you order? <em>(pick all that apply)</em></span><div class="chips"><% menuItems.forEach(item => { %><label class="chip"><input type="checkbox" name="ordered" value="<%= item.name %>"><span><%= item.name %></span></label><% }) %><label class="chip"><input type="checkbox" name="ordered" value="Something else"><span>Something else</span></label></div></div>
+        </fieldset>
+
+        <fieldset class="fb-group"><legend><span class="step">2</span> Overall experience</legend>
+          <div class="field" data-field="rating"><span class="q">How would you rate your visit overall?</span><div class="rating-row"><div class="rating" role="radiogroup" aria-label="Overall rating"><input type="radio" id="r5" name="rating" value="5"><label for="r5" title="5 stars">★</label><input type="radio" id="r4" name="rating" value="4"><label for="r4" title="4 stars">★</label><input type="radio" id="r3" name="rating" value="3"><label for="r3" title="3 stars">★</label><input type="radio" id="r2" name="rating" value="2"><label for="r2" title="2 stars">★</label><input type="radio" id="r1" name="rating" value="1"><label for="r1" title="1 star">★</label></div><span class="rating-label" id="ratingLabel">Tap a star</span></div></div>
+        </fieldset>
+
+        <fieldset class="fb-group"><legend><span class="step">3</span> The food</legend>
+          <div class="grid-2">
+            <div class="field"><label for="rated_dish">Which dish are you reviewing?</label><select id="rated_dish" name="rated_dish" data-track><option value="">Choose one</option><% menuItems.forEach(item => { %><option><%= item.name %></option><% }) %><option>Something else</option></select></div>
+            <div class="field"><label for="taste">Taste and flavour</label><select id="taste" name="taste" data-track><option value="">Choose one</option><option>Delicious</option><option>Good</option><option>Okay</option><option>Needs improvement</option><option>Poor</option></select></div>
+            <div class="field"><label for="freshness">Was the food fresh?</label><select id="freshness" name="freshness" data-track><option value="">Choose one</option><option>Very fresh</option><option>Fresh</option><option>Okay</option><option>Not very fresh</option></select></div>
+            <div class="field"><label for="temperature">Was it served at the right temperature?</label><select id="temperature" name="temperature" data-track><option value="">Choose one</option><option>Just right</option><option>A little cold</option><option>Too cold</option><option>Too hot</option></select></div>
+            <div class="field"><label for="portion">Was the portion size satisfactory?</label><select id="portion" name="portion" data-track><option value="">Choose one</option><option>More than enough</option><option>Just right</option><option>A little small</option><option>Too small</option></select></div>
+            <div class="field"><label for="value">Was the food worth the price?</label><select id="value" name="value" data-track><option value="">Choose one</option><option>Great value</option><option>Fair price</option><option>A little expensive</option><option>Too expensive</option></select></div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fb-group"><legend><span class="step">4</span> Service</legend>
+          <div class="grid-2">
+            <div class="field"><label for="behaviour">How was the behaviour and service?</label><select id="behaviour" name="behaviour" data-track><option value="">Choose one</option><option>Excellent</option><option>Good</option><option>Average</option><option>Needs improvement</option></select></div>
+            <div class="field"><label for="wait_time">How long did you wait?</label><select id="wait_time" name="wait_time" data-track><option value="">Choose one</option><option>Under 5 minutes</option><option>5 to 10 minutes</option><option>10 to 15 minutes</option><option>More than 15 minutes</option></select></div>
+            <div class="field"><label for="order_correct">Was your order served correctly?</label><select id="order_correct" name="order_correct" data-track><option value="">Choose one</option><option>Yes, exactly as ordered</option><option>Mostly correct</option><option>No, something was wrong</option></select></div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fb-group"><legend><span class="step">5</span> Cleanliness</legend>
+          <div class="grid-2">
+            <div class="field"><label for="cleanliness">How clean was the stall?</label><select id="cleanliness" name="cleanliness" data-track><option value="">Choose one</option><option>Spotless</option><option>Clean</option><option>Acceptable</option><option>Needs attention</option></select></div>
+            <div class="field"><label for="hygiene">Was the food handled hygienically?</label><select id="hygiene" name="hygiene" data-track><option value="">Choose one</option><option>Excellent</option><option>Good</option><option>Could be better</option><option>Poor</option></select></div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fb-group"><legend><span class="step">6</span> In your own words</legend>
+          <div class="field"><label for="likedMost">What did you like the most?</label><textarea id="likedMost" name="liked_most" rows="2" placeholder="A dish, the service, the vibe..."></textarea></div>
+          <div class="field"><label for="couldImprove">What could be improved?</label><textarea id="couldImprove" name="could_improve" rows="2" placeholder="Be honest, it helps!"></textarea></div>
+          <div class="field"><label for="keepDoing">What should I continue doing?</label><textarea id="keepDoing" name="continue_doing" rows="2" placeholder="Something you'd hate to see change"></textarea></div>
+          <div class="field"><label for="improve_first">What should I improve first?</label><select id="improve_first" name="improve_first" data-track><option value="">Choose one</option><option>Taste and flavour</option><option>Waiting time</option><option>Portion size</option><option>Pricing</option><option>Cleanliness and hygiene</option><option>Menu variety</option><option>Service and behaviour</option><option>Payment options</option><option>Something else</option></select></div>
+          <div class="field"><label for="suggestions">Any other suggestions?</label><textarea id="suggestions" name="suggestions" rows="3" placeholder="New dishes, timings, offers, anything at all..."></textarea></div>
+        </fieldset>
+
+        <p class="form-error" id="formError" role="alert" aria-live="assertive"></p>
+        <button class="button button-primary submit-button" type="submit" id="submitBtn">Send my feedback <span>→</span></button>
+        <p class="form-note" id="formNote">Your feedback is submitted securely to this vendor’s feedback inbox. Your response helps them improve.</p>
+      </form>
+
+      <div class="thanks" id="thanks" hidden tabindex="-1">
+        <div class="thanks-icon">♥</div>
+        <h3 id="thanksTitle">Thank you!</h3>
+        <p id="thanksText"></p>
+        <p class="thanks-demo" id="thanksDemo"></p>
+        <button class="button button-outline" id="againBtn" type="button">Submit another response</button>
+      </div>
+    </section>
+  </main>
+
+  <section class="more-vendors"><div class="more-vendors-inner"><div><span class="eyebrow">KEEP EXPLORING</span><h2>Discover more neighbourhood vendors.</h2><p>There is always another local favourite waiting to be found.</p></div><div class="more-vendor-links"><% otherVendors.forEach(v => { %><a href="/v/<%= v.slug %>"><span><%= v.name %></span><b>↗</b></a><% }) %><a class="all-vendors" href="/">Explore all vendors <b>→</b></a></div></div></section>
+  <footer class="footer">
+    <a class="brand footer-brand" href="/"><span class="brand-mark">N</span><span><strong>Neighbourhood</strong><small>DISCOVER LOCAL FOOD</small></span></a>
+    <p><%= vendor.footer_line || "Fresh food, familiar flavours, made with care." %><br><%= vendor.hours || "Ask us for opening hours" %> · <a class="footer-phone" href="<%= vendor.phone_href || "#" %>"><%= vendor.phone_display || "Contact details coming soon" %></a></p>
+    <div class="footer-links"><a href="#menu">Menu</a><a href="#location">Location</a><a href="#feedback">Feedback</a></div>
+    <small>© <span id="year"></span> <%= vendor.name %>. Made with care.</small>
+  </footer>
+  <script>window.STALL = <%- JSON.stringify({address:vendor.address||"", mapQuery:vendor.address||vendor.name, mapsUrl:vendor.maps_url||"", openingHours:vendor.hours||"", phoneDisplay:vendor.phone_display||"", phoneHref:vendor.phone_href||"", zomato:vendor.zomato_url||"https://www.zomato.com/goa", swiggy:vendor.swiggy_url||"https://www.swiggy.com/", slug:vendor.slug, name:vendor.name}) %>;</script><script src="/vendor.js"></script>
+</body>
+</html>
