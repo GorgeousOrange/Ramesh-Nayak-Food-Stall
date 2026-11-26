@@ -43,12 +43,15 @@ function ensureStarterVendors() {
     (slug,name,owner_name,email,password_hash,category,tagline,description,hero_title,hero_subtitle,hero_description,greeting,story_intro,story_body,story_feedback,location_intro,address,hours,phone_display,phone_href,maps_url,zomato_url,swiggy_url,footer_line,logo_letter)
     VALUES (@slug,@name,@owner_name,@email,@password_hash,@category,@tagline,@description,@hero_title,@hero_subtitle,@hero_description,@greeting,@story_intro,@story_body,@story_feedback,@location_intro,@address,@hours,@phone_display,@phone_href,@maps_url,@zomato_url,@swiggy_url,@footer_line,@logo_letter)`);
   const starterPasswordHash = () => bcrypt.hashSync(crypto.randomBytes(32).toString('hex'), 12);
+  const vendorDemoHash = bcrypt.hashSync('123456789', 12);
   const rameshSlug = 'ramesh-naik-street-kitchen';
   let ramesh = db.prepare('SELECT id FROM vendors WHERE slug=?').get(rameshSlug);
   if (!ramesh) {
     const id = insertVendor.run({slug:rameshSlug,name:"Ramesh's Street Kitchen",owner_name:'Ramesh Naik',email:'ramesh@neighbourhood.local',password_hash:starterPasswordHash(),category:'Street food',tagline:'YOUR NEIGHBOURHOOD FOOD STOP',description:'From buttery pav bhaji to freshly made rolls, enjoy simple street-food favourites prepared fresh and served with care.',hero_title:'Good food.',hero_subtitle:'Good mood.',hero_description:'From buttery pav bhaji to freshly made rolls, enjoy simple street-food favourites prepared fresh and served with care.',greeting:'Namaskar!',story_intro:"I'm Ramesh Naik. I've been running my little street-food stall in Goa for the past 8 years, right where students and neighbours stop by for a bite after a long day.",story_body:'I pick the ingredients, cook every order and serve you myself, because I want each plate to be fresh and every customer to feel welcome. Whether you are here for a quick snack or a chat over chai, I am happy to see you.',story_feedback:'I am always trying to get better, so please tell me what you liked and what I can improve in the feedback section below.',location_intro:'Find me at BITS Goa, near the college and the residential area. Come hungry, leave happy.',address:"BITS Goa, D'Spine, Goa, India",hours:'Every day, 4 PM till midnight',phone_display:'+91 82619 67763',phone_href:'tel:+918261967763',maps_url:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent("BITS Goa, D'Spine, Goa, India"),zomato_url:'https://www.zomato.com/goa',swiggy_url:'https://www.swiggy.com/',footer_line:'Fresh food, familiar flavours, right here in Goa.',logo_letter:'R'}).lastInsertRowid;
     ramesh = {id};
   }
+  // Keep Ramesh's existing vendor account on the requested login credentials.
+  db.prepare('UPDATE vendors SET email=?, password_hash=? WHERE id=?').run('ramesh@gmail.com', vendorDemoHash, ramesh.id);
   const menuCount = db.prepare('SELECT COUNT(*) AS c FROM menu_items WHERE vendor_id=?').get(ramesh.id).c;
   if (!menuCount) {
     const add = db.prepare('INSERT INTO menu_items(vendor_id,name,description,price,label,image_url,sort_order) VALUES(?,?,?,?,?,?,?)');
@@ -63,28 +66,27 @@ function ensureStarterVendors() {
     menu.forEach((m,i)=>add.run(ramesh.id,...m,i));
   }
   const prakashSlug = 'prakashs-food-stall';
-  if (!db.prepare('SELECT id FROM vendors WHERE slug=?').get(prakashSlug)) {
-    insertVendor.run({slug:prakashSlug,name:"Prakash's Food Stall",owner_name:'Prakash',email:'prakash@neighbourhood.local',password_hash:starterPasswordHash(),category:'Food',tagline:'A LOCAL FOOD STORY',description:'Prakash is getting his stall page ready. Menu, photos and stall details will be added by the vendor.',hero_title:'Food made',hero_subtitle:'with heart.',hero_description:'A local food story is taking shape. Check back soon for the menu and details.',greeting:'Namaskar!',story_intro:'Welcome to my stall. I am getting my story ready to share with you.',story_body:'I will add more about the food I make, the ingredients I use and what makes this stall special.',story_feedback:'Once the page is ready, I would love to hear what you think.',location_intro:'Location details will be added soon.',address:'Location to be confirmed',hours:'To be confirmed',phone_display:'Contact details coming soon',phone_href:'',maps_url:'',zomato_url:'',swiggy_url:'',footer_line:'A local food story, coming soon.',logo_letter:'P'});
+  let prakash = db.prepare('SELECT id FROM vendors WHERE slug=?').get(prakashSlug);
+  if (!prakash) {
+    const id = insertVendor.run({slug:prakashSlug,name:"Prakash's Food Stall",owner_name:'Prakash',email:'prakash@neighbourhood.local',password_hash:starterPasswordHash(),category:'Food',tagline:'A LOCAL FOOD STORY',description:'Prakash is getting his stall page ready. Menu, photos and stall details will be added by the vendor.',hero_title:'Food made',hero_subtitle:'with heart.',hero_description:'A local food story is taking shape. Check back soon for the menu and details.',greeting:'Namaskar!',story_intro:'Welcome to my stall. I am getting my story ready to share with you.',story_body:'I will add more about the food I make, the ingredients I use and what makes this stall special.',story_feedback:'Once the page is ready, I would love to hear what you think.',location_intro:'Location details will be added soon.',address:'Location to be confirmed',hours:'To be confirmed',phone_display:'Contact details coming soon',phone_href:'',maps_url:'',zomato_url:'',swiggy_url:'',footer_line:'A local food story, coming soon.',logo_letter:'P'}).lastInsertRowid;
+    prakash = {id};
   }
+  // Keep Prakash's existing vendor account on the requested login credentials.
+  db.prepare('UPDATE vendors SET email=?, password_hash=? WHERE id=?').run('prakash@gmail.com', vendorDemoHash, prakash.id);
+}
+
+// Ensure the requested admin login exists, without treating vendors as admins.
+function ensureDefaultAdmin() {
+  const email = 'admin@gmail.com';
+  const hash = bcrypt.hashSync('123456789', 12);
+  const existing = db.prepare('SELECT id FROM admins WHERE email=?').get(email);
+  if (existing) db.prepare('UPDATE admins SET password_hash=? WHERE id=?').run(hash, existing.id);
+  else db.prepare('INSERT INTO admins(name,email,password_hash) VALUES(?,?,?)').run('Admin', email, hash);
+  // Remove any accidental vendor emails from the admin table.
+  db.prepare('DELETE FROM admins WHERE email IN (?,?)').run('prakash@gmail.com','ramesh@gmail.com');
 }
 ensureStarterVendors();
-
-// Idempotent bootstrap for the project's default demo admin accounts.
-function ensureStarterAdmins() {
-  const starterAdmins = [
-    { name: 'Admin', email: 'admin@gmail.com' },
-    { name: 'Prakash', email: 'prakash@gmail.com' },
-    { name: 'Ramesh', email: 'ramesh@gmail.com' }
-  ];
-  const exists = db.prepare('SELECT id FROM admins WHERE email=?');
-  const add = db.prepare('INSERT INTO admins(name,email,password_hash) VALUES(?,?,?)');
-  for (const admin of starterAdmins) {
-    if (!exists.get(admin.email)) {
-      add.run(admin.name, admin.email, bcrypt.hashSync('123456789', 12));
-    }
-  }
-}
-ensureStarterAdmins();
+ensureDefaultAdmin();
 
 app.set('view engine', 'ejs'); app.set('views', path.join(ROOT, 'views'));
 app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], scriptSrc: ["'self'", "'unsafe-inline'"], styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'], fontSrc: ["'self'", 'https://fonts.gstatic.com'], imgSrc: ["'self'", 'data:', 'https:'], connectSrc: ["'self'"] } } }));
