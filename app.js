@@ -69,6 +69,23 @@ function ensureStarterVendors() {
 }
 ensureStarterVendors();
 
+// Idempotent bootstrap for the project's default demo admin accounts.
+function ensureStarterAdmins() {
+  const starterAdmins = [
+    { name: 'Admin', email: 'admin@gmail.com' },
+    { name: 'Prakash', email: 'prakash@gmail.com' },
+    { name: 'Ramesh', email: 'ramesh@gmail.com' }
+  ];
+  const exists = db.prepare('SELECT id FROM admins WHERE email=?');
+  const add = db.prepare('INSERT INTO admins(name,email,password_hash) VALUES(?,?,?)');
+  for (const admin of starterAdmins) {
+    if (!exists.get(admin.email)) {
+      add.run(admin.name, admin.email, bcrypt.hashSync('123456789', 12));
+    }
+  }
+}
+ensureStarterAdmins();
+
 app.set('view engine', 'ejs'); app.set('views', path.join(ROOT, 'views'));
 app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], scriptSrc: ["'self'", "'unsafe-inline'"], styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'], fontSrc: ["'self'", 'https://fonts.gstatic.com'], imgSrc: ["'self'", 'data:', 'https:'], connectSrc: ["'self'"] } } }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' })); app.use(express.json({ limit: '1mb' }));
